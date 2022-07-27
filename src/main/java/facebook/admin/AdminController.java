@@ -17,7 +17,7 @@ public class AdminController {
     @PostMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void addRole(@PathVariable Long id, AccountRole accountRole){
-        adminService.addRole(id, accountRole);
+        adminService.updateRole(id, accountRole);
     }
 
 }

@@ -11,9 +11,10 @@ public class AdminService {
     private final AccountService accountService;
     private final AccountMapper accountMapper;
 
-    public void addRole(Long id, AccountRole accountRole){
-        Account account = accountService.getAccount(id);
-        account.getAccountRoles().add(accountRole);
+    public void updateRole(Long id, AccountRole accountRole){
+        Account account = accountService.getAccountEntity(id);
+        account.setAccountRole(null);
+        account.setAccountRole(accountRole);
     }
 
 }

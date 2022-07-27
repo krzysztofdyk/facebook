@@ -2,18 +2,20 @@ package facebook.account;
 
 
 import com.sun.istack.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.List;
 
 @Builder
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Account {
 
     @Id
@@ -33,9 +35,11 @@ public class Account {
     private AccountStatus accountStatus;
 
     @NotNull
-    private List<AccountRole> accountRoles;
+    private AccountRole accountRole;
 
     @NotNull
     private Boolean available;
+
+    private Long sumOfMoney;
 
 }

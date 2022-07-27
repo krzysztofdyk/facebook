@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 
@@ -24,51 +24,48 @@ public class AccountService {
     }
 
     private Account createAccountEntityFromDto(AccountDto accountDto) {
-        List<AccountRole> accountRoles = new ArrayList<>();
-        accountRoles.add(AccountRole.Employee);
         return Account.builder()
                 .firstName(accountDto.getFirstName())
                 .lastName(accountDto.getLastName())
                 .email(accountDto.getEmail())
                 .city(accountDto.getCity())
                 .accountStatus(AccountStatus.Candidate)
-                .accountRoles(accountRoles)
+                .accountRole(AccountRole.Employee)
                 .available(true)
                 .build();
     }
 
-    public List<AccountDto> getAllAccounts(){
+    public List<Account> getAllAccounts(){
         List<Account> accounts = accountRepository.findAll();
         log.info("All accounts were delivered.");
-        return accountMapper.mapToAccountDtoList(accounts);
-
-    }
-
-    public AccountDto getAccountDto(Long id){
-        Account account = accountRepository.getById(id);
-        log.info("Account was delivered.");
-        return accountMapper.mapToAccountDto(account);
+        return accounts;
     }
 
     public Account getAccount(Long id){
+        Account account = accountRepository.findById(id).orElseThrow(()->new EntityNotFoundException(String.format("Account ID: %s not found",id)));
+        if (id.equals(account.getId())) {
+            log.info("Account was delivered.");
+        }
+        return account;
+    }
+
+    public Account getAccountEntity(Long id){
         log.info("Account entity was delivered.");
         return accountRepository.getById(id);
     }
 
     public void updateAccount(Long id, AccountDto accountDto){
         Account account = accountRepository.getById(id);
-        account.setFirstName(account.getFirstName());
+        account.setFirstName(accountDto.getFirstName());
         account.setLastName(accountDto.getLastName());
-        account.setEmail(account.getEmail());
-        account.setCity(account.getCity());
-        log.info("Account was updated.");
+        account.setEmail(accountDto.getEmail());
+        account.setCity(accountDto.getCity());
+        log.info("Account with ID: {} was updated.",id);
     }
 
     public void deleteAccount(Long id){
         Account account = accountRepository.getById(id);
         accountRepository.delete(account);
-        log.info("Account was deleted.");
+        log.info("Account with ID: {} was deleted.", id);
     }
-
-
 }

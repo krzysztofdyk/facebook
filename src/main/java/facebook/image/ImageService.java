@@ -37,7 +37,7 @@ public class ImageService {
     public byte[] downloadImage(Long id) {
         Image image = imageRepository.getById(id);
         log.info("Image download finished.");
-        mapDto(image);
+        //mapDto(image);
         return image.getImageByte();
     }
 

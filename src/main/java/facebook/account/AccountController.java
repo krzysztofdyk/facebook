@@ -11,21 +11,21 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/account")
+@RequestMapping("/api/accounts")
 public class AccountController {
 
     private final AccountService accountService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<AccountDto> getAllAccounts(){
+    public List<Account> getAllAccounts(){
         return accountService.getAllAccounts();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public AccountDto getAccount(@PathVariable Long id){
-        return accountService.getAccountDto(id);
+    public Account getAccount(@PathVariable(name = "id") Long id){
+        return accountService.getAccount(id);
     }
 
     @PostMapping
