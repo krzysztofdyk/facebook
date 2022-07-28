@@ -2,14 +2,15 @@ package facebook.account;
 
 
 import com.sun.istack.NotNull;
+import facebook.enums.KeyStatus;
+import facebook.enums.AccountRole;
+import facebook.enums.AccountStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
+import javax.persistence.*;
 
 @Builder
 @Entity
@@ -22,6 +23,10 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated()
+    @NotNull
+    private KeyStatus keyStatus;
+
     @NotNull
     private String firstName;
 
@@ -31,9 +36,11 @@ public class Account {
     private String email;
     private String city;
 
+    @Enumerated()
     @NotNull
     private AccountStatus accountStatus;
 
+    @Enumerated()
     @NotNull
     private AccountRole accountRole;
 

@@ -1,12 +1,16 @@
 package facebook.account;
 
 
+import facebook.enums.KeyStatus;
+import facebook.enums.AccountRole;
+import facebook.enums.AccountStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -25,6 +29,7 @@ public class AccountService {
 
     private Account createAccountEntityFromDto(AccountDto accountDto) {
         return Account.builder()
+                .keyStatus(KeyStatus.Active)
                 .firstName(accountDto.getFirstName())
                 .lastName(accountDto.getLastName())
                 .email(accountDto.getEmail())
@@ -37,8 +42,11 @@ public class AccountService {
 
     public List<Account> getAllAccounts(){
         List<Account> accounts = accountRepository.findAll();
-        log.info("All accounts were delivered.");
-        return accounts;
+        List<Account> activeAccounts = accounts.stream()
+                                                .filter(account -> account.getKeyStatus().equals(KeyStatus.Active))
+                                                .collect(Collectors.toList());
+        log.info("All active accounts were delivered.");
+        return activeAccounts;
     }
 
     public Account getAccount(Long id){

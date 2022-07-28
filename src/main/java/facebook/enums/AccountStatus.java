@@ -1,4 +1,4 @@
-package facebook.account;
+package facebook.enums;
 
 public enum AccountStatus {
     Candidate,
