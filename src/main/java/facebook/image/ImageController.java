@@ -25,9 +25,9 @@ public class ImageController {
     }
 
     @PostMapping(value = "/download/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public byte[] download(@PathVariable Long id) {
+    public byte[] download(@PathVariable Long imageId) {
         log.info("Image download started.");
-        return imageService.downloadImage(id);
+        return imageService.downloadImage(imageId);
 
     }
 }

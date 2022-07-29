@@ -1,11 +1,9 @@
 package facebook.account;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @Slf4j
@@ -18,14 +16,14 @@ public class AccountController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Account> getAllAccounts(){
-        return accountService.getAllAccounts();
+    public List<Account> getAllAccounts(@RequestParam (name = "isActive", required = false) Boolean isActive){
+        return accountService.getAllAccounts(isActive);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{accountId}")
     @ResponseStatus(HttpStatus.OK)
-    public Account getAccount(@PathVariable(name = "id") Long id){
-        return accountService.getAccount(id);
+    public Account getAccount(@PathVariable(name = "accountId") Long accountId){
+        return accountService.getAccount(accountId);
     }
 
     @PostMapping
@@ -34,15 +32,15 @@ public class AccountController {
         return HttpStatus.CREATED;
     }
 
-    @PutMapping("/{id}")
-    public HttpStatus updateAccount(@PathVariable Long id, @RequestBody AccountDto accountDto){
-        accountService.updateAccount(id,accountDto);
+    @PutMapping("/{accountId}")
+    public HttpStatus updateAccount(@PathVariable Long accountId, @RequestBody AccountDto accountDto){
+        accountService.updateAccount(accountId,accountDto);
         return HttpStatus.ACCEPTED;
     }
 
-    @DeleteMapping("/{id}")
-    public HttpStatus deleteAccount (@PathVariable Long id){
-        accountService.deleteAccount(id);
+    @DeleteMapping("/{accountId}")
+    public HttpStatus deleteAccount (@PathVariable Long accountId){
+        accountService.deleteAccount(accountId);
         return HttpStatus.NO_CONTENT;
     }
 }

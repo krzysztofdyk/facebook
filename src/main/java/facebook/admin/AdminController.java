@@ -14,16 +14,21 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @PostMapping("/{id}")
+    @PutMapping("/{accountId}/role")
     @ResponseStatus(HttpStatus.OK)
-    public void updateRole(@PathVariable Long id, @RequestBody AccountRole accountRole){
-        adminService.updateRole(id, accountRole);
+    public void updateRole(@PathVariable Long accountId, @RequestBody AccountRole accountRole){
+        adminService.updateRole(accountId, accountRole);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{accountId}/status")
     @ResponseStatus(HttpStatus.OK)
-    public void changeKeyStatus(@PathVariable Long id){
-        adminService.changeActiveStatus(id);
+    public void changeKeyStatus(@PathVariable Long accountId){
+        adminService.changeActiveStatus(accountId);
     }
 
+    @PutMapping("/{accountId}/balance")
+    @ResponseStatus(HttpStatus.OK)
+    public void addMoney(@PathVariable Long accountId, @RequestBody MoneyDto moneyDto){
+        adminService.addMoney(accountId,moneyDto);
+    }
 }

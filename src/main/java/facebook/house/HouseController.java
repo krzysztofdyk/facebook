@@ -25,17 +25,17 @@ public class HouseController {
         return houseService.findAllHouses();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{houseId}")
     @ResponseStatus(HttpStatus.OK)
-    public HttpStatus updateHouse(@PathVariable Long id, @RequestBody HouseDto houseDto) {
-        houseService.updateHouse(id, houseDto);
+    public HttpStatus updateHouse(@PathVariable Long houseId, @RequestBody HouseDto houseDto) {
+        houseService.updateHouse(houseId, houseDto);
         return HttpStatus.OK;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{houseId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public HttpStatus deleteHouse(@PathVariable Long id) {
-        houseService.deleteHouse(id);
+    public HttpStatus deleteHouse(@PathVariable Long houseId) {
+        houseService.deleteHouse(houseId);
         return HttpStatus.NO_CONTENT;
     }
 }

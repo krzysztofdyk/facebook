@@ -50,14 +50,14 @@ public class HouseService {
                 .build();
     }
 
-    public void deleteHouse(Long id) {
-        House house = houseRepository.getById(id);
+    public void deleteHouse(Long houseId) {
+        House house = houseRepository.getById(houseId);
         houseRepository.delete(house);
         log.info("House: " + house.getName() + " was deleted.");
     }
 
-    public void  updateHouse(Long id, HouseDto houseDto) {
-        House house = houseRepository.getById(id);
+    public void  updateHouse(Long houseId, HouseDto houseDto) {
+        House house = houseRepository.getById(houseId);
         house.setName(houseDto.getName());
         house.setUnitPrice(houseDto.getUnitPrice());
         house.setArea(houseDto.getArea());

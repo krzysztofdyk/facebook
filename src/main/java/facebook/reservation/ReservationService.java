@@ -70,12 +70,11 @@ public class ReservationService {
         }
     }*/
 
-    public Reservation findReservationByHouse(String name){
-        if (name != null && !name.isBlank()) {
-            return reservationRepository.findByHouse(name);
+    public Reservation findReservationByHouse(String houseName){
+        if (houseName != null && !houseName.isBlank()) {
+            return reservationRepository.findByHouse(houseName);
         } return null;
     }
-
 
     public Reservation updateReservation(Long reservationId, ReservationDto reservationDto) {
         Reservation reservation = reservationRepository.getById(reservationId);
@@ -87,8 +86,8 @@ public class ReservationService {
         return reservation;
     }
 
-    public void deleteReservation(Long id) {
-        Reservation reservation = reservationRepository.getById(id);
+    public void deleteReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.getById(reservationId);
         reservationRepository.delete(reservation);
         log.info("Reservation: {} was deleted", reservation.getId());
     }

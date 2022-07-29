@@ -29,4 +29,12 @@ public class AdminService {
         }
         accountRepository.save(account);
     }
+
+    public void addMoney(Long accountId, MoneyDto moneyDto){
+        Account account = accountRepository.getById(accountId);
+        Long accountBalance = account.getBalance();
+        accountBalance= accountBalance + moneyDto.getMoney();
+        account.setBalance(accountBalance);
+        accountRepository.save(account);
+    }
 }

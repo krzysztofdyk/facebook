@@ -1,6 +1,5 @@
 package facebook.account;
 
-
 import com.sun.istack.NotNull;
 import facebook.enums.KeyStatus;
 import facebook.enums.AccountRole;
@@ -9,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.*;
 
 @Builder
@@ -47,6 +45,6 @@ public class Account {
     @NotNull
     private Boolean available;
 
-    private Long sumOfMoney;
+    private Long balance;
 
 }

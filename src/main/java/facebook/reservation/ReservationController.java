@@ -28,24 +28,24 @@ public class ReservationController {
         return reservationService.mapEntityToDtoList(reservationList);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.OK)
-    public ReservationDtoResponse findReservation(@PathVariable Long id){
-        Reservation reservation = reservationRepository.getById(id);
+    public ReservationDtoResponse findReservation(@PathVariable Long reservationId){
+        Reservation reservation = reservationRepository.getById(reservationId);
         return reservationService.mapEntityToDto(reservation);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ReservationDtoResponse updateReservation(@PathVariable Long id, @RequestBody ReservationDto reservationDto){
-        Reservation reservation = reservationService.updateReservation(id, reservationDto);
+    public ReservationDtoResponse updateReservation(@PathVariable Long reservationId, @RequestBody ReservationDto reservationDto){
+        Reservation reservation = reservationService.updateReservation(reservationId, reservationDto);
         return reservationService.mapEntityToDto(reservation);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{reservationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public HttpStatus deleteReservation(@PathVariable Long id){
-        reservationService.deleteReservation(id);
+    public HttpStatus deleteReservation(@PathVariable Long reservationId){
+        reservationService.deleteReservation(reservationId);
         return HttpStatus.NO_CONTENT;
     }
 }

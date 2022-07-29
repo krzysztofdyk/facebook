@@ -34,8 +34,8 @@ public class ImageService {
     }
 
     @Transactional
-    public byte[] downloadImage(Long id) {
-        Image image = imageRepository.getById(id);
+    public byte[] downloadImage(Long imageId) {
+        Image image = imageRepository.getById(imageId);
         log.info("Image download finished.");
         //mapDto(image);
         return image.getImageByte();
