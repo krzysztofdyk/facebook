@@ -1,5 +1,6 @@
 package facebook.account;
 
+import facebook.email.EmailService;
 import facebook.enums.KeyStatus;
 import facebook.enums.AccountRole;
 import facebook.enums.AccountStatus;
@@ -17,10 +18,16 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
+    private final EmailService emailService;
 
-    public void createAccount(AccountDto accountDto) {
+    public void createAccount(AccountDto accountDto){
         Account account = createAccountEntityFromDto(accountDto);
         accountRepository.save(account);
+        try {
+            emailService.sendEmail("dyk.krzysztof@gmail.com", "Account for " + accountDto.getFirstName() + " " + accountDto.getLastName() + " was created.", "Your account was created.");
+        } catch(Exception e){
+            throw new RuntimeException("There was some problem with sending an email.");
+        }
         log.info("Account with ID: {} was created.", account.getId());
     }
 
