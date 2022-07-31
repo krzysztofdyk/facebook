@@ -16,13 +16,13 @@ public class AccountController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Account> getAllAccounts(@RequestParam (name = "isActive", required = false) Boolean isActive){
+    public List<AccountDtoResponse> getAllAccounts(@RequestParam (name = "isActive", required = false) Boolean isActive){
         return accountService.getAllAccounts(isActive);
     }
 
     @GetMapping("/{accountId}")
     @ResponseStatus(HttpStatus.OK)
-    public Account getAccount(@PathVariable(name = "accountId") Long accountId){
+    public AccountDtoResponse getAccount(@PathVariable(name = "accountId") Long accountId){
         return accountService.getAccount(accountId);
     }
 

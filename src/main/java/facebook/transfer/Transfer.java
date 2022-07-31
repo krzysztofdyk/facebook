@@ -1,5 +1,6 @@
 package facebook.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import facebook.account.Account;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,7 @@ public class Transfer {
 
     private String currency;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn (name = "from_account_id")
     private Account fromAccount;

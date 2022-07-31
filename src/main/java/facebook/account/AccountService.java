@@ -45,16 +45,17 @@ public class AccountService {
                 .build();
     }
 
-    public List<Account> getAllAccounts(Boolean isActive) {
+    public List<AccountDtoResponse> getAllAccounts(Boolean isActive) {
         List<Account> accounts = accountRepository.findAll();
         if (isActive.equals(true)) {
             log.info("Active accounts were shown.");
-            return accounts.stream()
+            List<Account> activeAccounts = accounts.stream()
                     .filter(account -> account.getKeyStatus().equals(KeyStatus.Active))
                     .collect(Collectors.toList());
+            return accountMapper.mapToAccountDtoResponseList(activeAccounts);
         } else if (isActive == null || isActive.equals(false)) {
             log.info("Active and inactive accounts were shown.");
-            return accounts;
+            return accountMapper.mapToAccountDtoResponseList(accounts);
         }
         return null;
     }
@@ -63,13 +64,13 @@ public class AccountService {
         return account.getKeyStatus().equals(KeyStatus.Active);
     }
 
-    public Account getAccount(Long id){
+    public AccountDtoResponse getAccount(Long id){
         Account account = accountRepository.findById(id)
                 .orElseThrow(()->new EntityNotFoundException(String.format("Account ID: %s was not found",id)));
         if (id.equals(account.getId())) {
             log.info("Account with ID: {} was shown.", id);
         }
-        return account;
+        return accountMapper.mapToAccountDtoResponse(account);
     }
 
     public Account getAccountEntity(Long accountId){
