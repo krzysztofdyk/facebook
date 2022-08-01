@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import facebook.enums.KeyStatus;
 import facebook.enums.AccountRole;
 import facebook.enums.AccountStatus;
+import facebook.image.Image;
 import facebook.transfer.Transfer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -51,5 +52,8 @@ public class Account {
 
     @OneToMany(mappedBy = "fromAccount")
     private List<Transfer> transferList;
+
+    @OneToOne(mappedBy = "account")
+    private Image image;
 
 }

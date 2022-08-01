@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 public class AccountDtoResponse {
     private Long id;
+    private Long imageId;
     private KeyStatus keyStatus;
     private String firstName;
     private String lastName;

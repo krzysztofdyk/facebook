@@ -1,9 +1,7 @@
 package facebook.word;
 
 
-import facebook.account.Account;
 import facebook.account.AccountRepository;
-import facebook.transfer.Transfer;
 import facebook.transfer.TransferRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,17 +20,20 @@ public class WordController {
     TransferRepository transferRepository;
 
     @GetMapping("/transfers-history/{transferId}")
-    public HttpStatus downloadTransferByTransferId(@PathVariable(name = "transferId") Long transferId){
-        Transfer transfer = transferRepository.getById(transferId);
-        Account account = accountRepository.getById(transfer.getFromAccount().getId());
-        wordService.createSingleWord(transfer, account);
-        return HttpStatus.CREATED;
+    public HttpStatus downloadTransferConfirmationByTransferId(@PathVariable(name = "transferId") Long transferId){
+        wordService.createTransferConfirmationReport(transferId);
+        return HttpStatus.OK;
     }
 
     @GetMapping("/accounts-history/{accountId}")
     public HttpStatus downloadTransfersByAccountId(@PathVariable(name = "accountId") Long accountId){
-        Account account = accountRepository.getById(accountId);
-        wordService.createWordByUser(account);
-        return HttpStatus.CREATED;
+        wordService.createAllTransfersReport(accountId);
+        return HttpStatus.OK;
+    }
+
+    @GetMapping("/profile/{accountId}")
+    public HttpStatus downloadProfileByAccountId(@PathVariable(name = "accountId") Long accountId){
+        wordService.createProfileByAccountId(accountId);
+        return HttpStatus.OK;
     }
 }

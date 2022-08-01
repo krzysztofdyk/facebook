@@ -1,56 +1,69 @@
 package facebook.word;
 
 import facebook.account.Account;
+import facebook.account.AccountRepository;
+import facebook.image.Image;
+import facebook.image.ImageRepository;
 import facebook.transfer.Transfer;
+import facebook.transfer.TransferRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.util.Units;
+import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @AllArgsConstructor
 @Service
 @Slf4j
+@Transactional
 public class WordService {
 
-    public void createSingleWord(Transfer transfer, Account account){
+    AccountRepository accountRepository;
+    TransferRepository transferRepository;
+    ImageRepository imageRepository;
+
+    public void createTransferConfirmationReport(Long transferId){
+        Transfer transfer = transferRepository.getById(transferId);
+        Account fromAccount = transfer.getFromAccount();
+        Account toAccount = transfer.getToAccount();
         try {
             log.info("Start creating single word document for 1 transfer.");
             XWPFDocument document = new XWPFDocument();
-            makeHeader(document, "Transfer confirmation");
-            makeText(document, "Sender: " + account.getFirstName() + " " + account.getLastName());
+            String header = "Transfer confirmation for transfer ID: " + transfer.getId();
             String amountCurrency = "Amount: " + transfer.getAmount() + " " + transfer.getCurrency();
+            String sender = "Sender: " + fromAccount.getFirstName() + " " + fromAccount.getLastName();
+            String receiver = "Receiver: " + toAccount.getFirstName() + " " + toAccount.getLastName();
+            makeHeader(document, header);
+            makeText(document,"");
+            makeText(document,sender );
+            makeText(document, receiver);
             makeText(document, amountCurrency);
-            log.info("Processing single word document for 1 transfer.");
-            LocalDate localDate = transfer.getLocalDate();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-            String formattedDate = "Executed: " + localDate.format(formatter);
-            makeText(document, formattedDate);
-            timeStamp(document);
-            saveWord(document, account.getLastName());
+            dateStamp(document,transfer);
+            timeStamp(document,transfer);
+            saveWord(document,"Transfer_confirmation_", fromAccount.getLastName());
             log.info("End creating single word document for 1 transfer.");
         }catch(Exception e){
             System.out.println("Error occurred while executing: createSingleWord.");
         }
     }
 
-    public void createWordByUser(Account account){
+    public void createAllTransfersReport(Long accountId){
+        Account account = accountRepository.getById(accountId);
         log.info("Start creating word document for 1 user.");
         XWPFDocument document = new XWPFDocument();
-        makeHeader(document,"History of all transfers of user: " +account.getFirstName()+" "+account.getLastName());
+        String header = "History of all transfers of user: " +account.getFirstName()+" "+account.getLastName();
+        makeHeader(document,header);
         List<Transfer> transferList = account.getTransferList();
         for (Transfer transfer : transferList) {
-            createTextWord(document,transfer);
+            createOneTransferBody(document,transfer);
         }
         try {
             LocalDate localDate = LocalDate.now();
@@ -59,7 +72,7 @@ public class WordService {
             LocalTime localTime = LocalTime.now();
             DateTimeFormatter formatterLocalTime = DateTimeFormatter.ofPattern("HH-mm-ss");
             String stringTime = localTime.format(formatterLocalTime);
-            File file = new File("D:/AllTransfers_" + account.getLastName() + "_" + stringDate + "_" + stringTime + ".docx");
+            File file = new File("D:/Transfers_" + account.getLastName() + "_" + stringDate + "_" + stringTime + ".docx");
             file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
             document.write(out);
@@ -70,19 +83,21 @@ public class WordService {
         }
     }
 
-    private void createTextWord(XWPFDocument document,Transfer transfer){
-            makeText(document, "Transfer ID: " + transfer.getId());
+    private void createOneTransferBody(XWPFDocument document,Transfer transfer){
+            String transferId =  "Transfer ID: " + transfer.getId();
             String amountCurrency = "Amount: " + transfer.getAmount() + " " + transfer.getCurrency();
+            makeText(document, transferId);
             makeText(document, amountCurrency);
-            LocalDate localDate = transfer.getLocalDate();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-            String formattedDate = "Executed: " + localDate.format(formatter);
-            makeText(document, formattedDate);
+            timeStamp(document,transfer);
+            dateStamp(document,transfer);
+            XWPFParagraph paragraph = document.createParagraph();
+            paragraph.setBorderBottom(Borders.SINGLE);
     }
 
     private void makeHeader(XWPFDocument document, String header){
         XWPFParagraph paragraphTitle = document.createParagraph();
         paragraphTitle.setAlignment(ParagraphAlignment.LEFT);
+        paragraphTitle.setBorderBottom(Borders.CELTIC_KNOTWORK);
         XWPFRun paragraphTitleRun = paragraphTitle.createRun();
         paragraphTitleRun.setText(header);
         paragraphTitleRun.setBold(true);
@@ -97,27 +112,66 @@ public class WordService {
         paragraphTextRun.setText(text+ "\r\n"+System.lineSeparator()+"\r\n");
     }
 
-    private void timeStamp(XWPFDocument document){
+    private void dateStamp(XWPFDocument document , Transfer transfer){
         XWPFParagraph paragraphText = document.createParagraph();
         paragraphText.setAlignment(ParagraphAlignment.LEFT);
         XWPFRun paragraphTextRun = paragraphText.createRun();
-        LocalTime localTime = LocalTime.now();
+        LocalDate localDate = transfer.getLocalDate();
+        DateTimeFormatter formatterDate = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        String stringDate =localDate.format(formatterDate);
+        paragraphTextRun.setText("Date: "+ stringDate);
+    }
+
+    private void timeStamp(XWPFDocument document, Transfer transfer){
+        XWPFParagraph paragraphText = document.createParagraph();
+        paragraphText.setAlignment(ParagraphAlignment.LEFT);
+        XWPFRun paragraphTextRun = paragraphText.createRun();
+        LocalTime localTime = transfer.getLocalTime();
         DateTimeFormatter formatterLocalTime = DateTimeFormatter.ofPattern("HH-mm-ss");
         String stringTime = localTime.format(formatterLocalTime);
         paragraphTextRun.setText("Time: "+ stringTime);
     }
 
-    private void saveWord(XWPFDocument document, String fileName) throws IOException {
+    private void saveWord(XWPFDocument document,String typeName, String fileName) throws IOException {
         LocalDate localDate = LocalDate.now();
         DateTimeFormatter formatterLocalDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String stringDate =localDate.format(formatterLocalDate);
         LocalTime localTime = LocalTime.now();
         DateTimeFormatter formatterLocalTime = DateTimeFormatter.ofPattern("HH-mm-ss");
         String stringTime = localTime.format(formatterLocalTime);
-        File file = new File("D:/Transfer_"+fileName+"_"+stringDate +"_"+stringTime+".docx");
+        File file = new File("D:/"+typeName+fileName+"_"+stringDate +"_"+stringTime+".docx");
         file.createNewFile();
         FileOutputStream out = new FileOutputStream(file);
         document.write(out);
         out.close();
+    }
+
+    public void createProfileByAccountId(Long accountId) {
+        try {
+        Account account = accountRepository.getById(accountId);
+        XWPFDocument document = new XWPFDocument();
+        String header = "Profile of: " + account.getFirstName() + " " + account.getLastName();
+        makeHeader(document, header);
+        makeText(document,"");
+        String email = "Email: " + account.getEmail();
+        makeText(document,email);
+        attachPhoto(document,account);
+        saveWord(document,"Profile_", account.getLastName());
+        } catch(Exception e){
+            System.out.println("Some problem occurred while saving the profile as word file.");
+        }
+    }
+
+    private void attachPhoto(XWPFDocument document,Account account) {
+        try {
+        Image image = imageRepository.getById(account.getImage().getId());
+        XWPFParagraph paragraphText = document.createParagraph();
+        XWPFRun paragraphTextRun = paragraphText.createRun();
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(image.getImageByte());
+        paragraphTextRun.addPicture(byteArrayInputStream,XWPFDocument.PICTURE_TYPE_JPEG,image.getImageName(), 0,0);
+        }
+        catch(Exception e){
+            System.out.println("some problems wit attaching photo");
+        }
     }
 }

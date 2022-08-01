@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class ImageDtoResponse {
     private long id;
+    private long accountId;
     private String imageName;
-    private byte[] imageByte;
+    //private byte[] imageByte;
 }

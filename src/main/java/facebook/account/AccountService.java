@@ -23,11 +23,11 @@ public class AccountService {
     public void createAccount(AccountDto accountDto){
         Account account = createAccountEntityFromDto(accountDto);
         accountRepository.save(account);
-        try {
+     /*   try {
             emailService.sendEmail("dyk.krzysztof@gmail.com", "Account for " + accountDto.getFirstName() + " " + accountDto.getLastName() + " was created.", "Your account was created.");
         } catch(Exception e){
             throw new RuntimeException("There was some problem with sending an email.");
-        }
+        }*/
         log.info("Account with ID: {} was created.", account.getId());
     }
 
@@ -83,6 +83,7 @@ public class AccountService {
         account.setLastName(accountDto.getLastName());
         account.setEmail(accountDto.getEmail());
         account.setCity(accountDto.getCity());
+        accountRepository.save(account);
         log.info("Account with ID: {} was updated.",accountId);
     }
 

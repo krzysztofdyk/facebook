@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +29,7 @@ public class ExcelService {
     AccountRepository accountRepository;
 
     public void downloadAccountsExcel(){
+        log.info("Downloading the excel with accounts: started.");
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet accountsSheet = workbook.createSheet("Accounts");
         try {
@@ -43,14 +47,18 @@ public class ExcelService {
         } catch(Exception e){
             System.out.println("Error occurred while executing: downloadAccountsExcel(): saveFile().");
         }
+        log.info("Downloading the excel with accounts: ended.");
     }
 
     private void buildHeader(XSSFSheet accountsSheet) {
-        XSSFRow row = accountsSheet.createRow(0);
-        //accountsSheet.setDefaultColumnWidth(5000);
+        XSSFRow row = accountsSheet.createRow(1);
+        accountsSheet.setDefaultColumnWidth(15);
         buildCells(row,1,blackCellStyle(accountsSheet.getWorkbook()),"LP" );
         buildCells(row,2,blackCellStyle(accountsSheet.getWorkbook()),"FIRST NAME" );
         buildCells(row,3,blackCellStyle(accountsSheet.getWorkbook()),"LAST NAME" );
+        buildCells(row,4,blackCellStyle(accountsSheet.getWorkbook()),"EMAIL" );
+        buildCells(row,5,blackCellStyle(accountsSheet.getWorkbook()),"CITY" );
+        buildCells(row,6,blackCellStyle(accountsSheet.getWorkbook()),"BALANCE" );
     }
 
     private void buildCells(XSSFRow row, int columnIndex,  XSSFCellStyle cellStyle, String columnValue ) {
@@ -72,7 +80,13 @@ public class ExcelService {
     }
 
     private Object[] mapAccountToObjectArr(Account account){
-        return new Object[] {account.getId(),account.getFirstName(),account.getLastName()};
+        return new Object[] {   account.getId(),
+                                account.getFirstName(),
+                                account.getLastName(),
+                                account.getEmail(),
+                                account.getCity(),
+                                account.getBalance()
+        };
     }
 
     private void buildBody(XSSFSheet sheet){
@@ -82,7 +96,7 @@ public class ExcelService {
             accountMap.put(account.getId(), mapAccountToObjectArr(account));
             }
         Set<Long> accountIdSet = accountMap.keySet();
-        int rowNumber = 1;
+        int rowNumber = 2;
 
         for (Long id : accountIdSet) {
             XSSFRow row = sheet.createRow(rowNumber++);
@@ -98,7 +112,13 @@ public class ExcelService {
 
     private void saveFile(XSSFWorkbook workbook){
         try{
-            FileOutputStream out = new FileOutputStream( new File("D:/Accounts.xlsx"));
+            LocalDate localDate = LocalDate.now();
+            DateTimeFormatter formatterLocalDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String stringDate = localDate.format(formatterLocalDate);
+            LocalTime localTime = LocalTime.now();
+            DateTimeFormatter formatterLocalTime = DateTimeFormatter.ofPattern("HH-mm-ss");
+            String stringTime = localTime.format(formatterLocalTime);
+            FileOutputStream out = new FileOutputStream( new File("D:/Accounts_"+stringDate+"_"+stringTime+".xlsx"));
             workbook.write(out);
             out.close();}
         catch (IOException e){

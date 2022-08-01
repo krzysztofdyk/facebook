@@ -31,8 +31,10 @@ public class AccountMapper {
     public AccountDtoResponse mapToAccountDtoResponse(Account account){
         List<Transfer> transferList = account.getTransferList();
         List<Long> idList = transferList.stream().map(Transfer::getId).collect(Collectors.toList());
+        Long checkImageId = account.getImage() == null ? null : account.getImage().getId();
         return AccountDtoResponse.builder()
                 .id(account.getId())
+                .imageId(checkImageId)
                 .keyStatus(account.getKeyStatus())
                 .firstName(account.getFirstName())
                 .lastName(account.getLastName())
