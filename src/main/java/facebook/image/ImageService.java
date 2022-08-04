@@ -4,11 +4,15 @@ import ch.qos.logback.core.util.FileSize;
 import facebook.account.Account;
 import facebook.account.AccountRepository;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +22,8 @@ import java.util.stream.Collectors;
 @Data
 @Transactional
 public class ImageService {
+
+    private final String DOWNLOAD_PATH = "D:\\";
 
     private final ImageRepository imageRepository;
     private final AccountRepository accountRepository;
@@ -43,8 +49,12 @@ public class ImageService {
     }
 
     @Transactional
+    @SneakyThrows
     public byte[] downloadImage(Long imageId) {
         Image image = imageRepository.getById(imageId);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(image.getImageByte());
+        BufferedImage saveImage = ImageIO.read(byteArrayInputStream);
+        ImageIO.write(saveImage, "jpg", new File(DOWNLOAD_PATH+image.getImageName()));
         log.info("Image download finished.");
         return image.getImageByte();
     }

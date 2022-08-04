@@ -13,6 +13,8 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,6 +27,8 @@ import java.util.List;
 @Slf4j
 @Transactional
 public class WordService {
+
+    private final String DOWNLOAD_PATH = "D:\\";
 
     AccountRepository accountRepository;
     TransferRepository transferRepository;
@@ -168,7 +172,13 @@ public class WordService {
         XWPFParagraph paragraphText = document.createParagraph();
         XWPFRun paragraphTextRun = paragraphText.createRun();
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(image.getImageByte());
-        paragraphTextRun.addPicture(byteArrayInputStream,XWPFDocument.PICTURE_TYPE_JPEG,image.getImageName(), 0,0);
+        BufferedImage saveImage = ImageIO.read(byteArrayInputStream);
+        File file = new File(DOWNLOAD_PATH+image.getImageName());
+        ImageIO.write(saveImage, "jpg", file);
+        FileInputStream fileInputStream = new FileInputStream(file);
+        paragraphTextRun.addPicture(fileInputStream,XWPFDocument.PICTURE_TYPE_JPEG,image.getImageName(), Units.toEMU(450),Units.toEMU(400));
+        //paragraphTextRun.addPicture(byteArrayInputStream,XWPFDocument.PICTURE_TYPE_JPEG,image.getImageName(), 0,0);
+
         }
         catch(Exception e){
             System.out.println("some problems wit attaching photo");
