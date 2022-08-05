@@ -178,7 +178,6 @@ public class WordService {
         FileInputStream fileInputStream = new FileInputStream(file);
         paragraphTextRun.addPicture(fileInputStream,XWPFDocument.PICTURE_TYPE_JPEG,image.getImageName(), Units.toEMU(450),Units.toEMU(400));
         //paragraphTextRun.addPicture(byteArrayInputStream,XWPFDocument.PICTURE_TYPE_JPEG,image.getImageName(), 0,0);
-
         }
         catch(Exception e){
             System.out.println("some problems wit attaching photo");
