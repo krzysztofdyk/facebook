@@ -30,10 +30,16 @@ public class XmlController {
         log.info("XML upload started.");
         xmlService.uploadXml(xml);
     }
+
     @GetMapping("/download/{xmlId}")
     public void downloadXml(@PathVariable Long xmlId) {
         log.info("XML download started.");
         xmlService.downloadXml(xmlId);
     }
 
+    @GetMapping("/json/{xmlId}")
+    public String mapToJson(@PathVariable Long xmlId) throws IOException {
+        log.info("XML mapping to Json started.");
+        return xmlService.mapToJson(xmlId);
+    }
 }

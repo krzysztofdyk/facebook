@@ -1,12 +1,24 @@
 package facebook.xml;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.xml.stream.XMLStreamReader;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +62,37 @@ public class XmlService {
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         fileOutputStream.write(xml.getXmlByte());
         log.info("XML download finished.");
+    }
+
+
+    public void  getTheRoot(Long xmlId){
+        try {
+            Xml xml = xmlRepository.getById(xmlId);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream.write(xml.getXmlByte());
+            SAXReader saxReader = new SAXReader();
+            Document document = saxReader.read(String.valueOf(outputStream));
+            Element root = document.getRootElement();
+            List<String> list = new ArrayList<>();
+            for (Iterator<Element> it = root.elementIterator(); it.hasNext(); ) {
+                Element element = it.next();
+                list.add(element.getName());
+                System.out.println(element.getName());
+            }
+
+        }catch(Exception e){
+            System.out.println("There sth wrong " + e.getMessage());
+        }
+
+    }
+
+    public String mapToJson(Long xmlId) throws IOException{
+        Xml xml = xmlRepository.getById(xmlId);
+        XmlMapper xmlMapper = new XmlMapper();
+        JsonNode node = xmlMapper.readTree(xml.getXmlByte());
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(node);
+
     }
 }
 
