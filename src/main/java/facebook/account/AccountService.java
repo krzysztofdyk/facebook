@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -21,7 +23,7 @@ public class AccountService {
     private final EmailService emailService;
 
     public void createAccount(AccountDto accountDto){
-        Account account = createAccountEntityFromDto(accountDto);
+        Account account = createAccountFromDto(accountDto);
         accountRepository.save(account);
      /*   try {
             emailService.sendEmail("dyk.krzysztof@gmail.com", "Account for " + accountDto.getFirstName() + " " + accountDto.getLastName() + " was created.", "Your account was created.");
@@ -31,7 +33,8 @@ public class AccountService {
         log.info("Account with ID: {} was created.", account.getId());
     }
 
-    private Account createAccountEntityFromDto(AccountDto accountDto) {
+    private Account createAccountFromDto(AccountDto accountDto) {
+        validateEmail(accountDto.getEmail());
         return Account.builder()
                 .keyStatus(KeyStatus.Active)
                 .firstName(accountDto.getFirstName())
@@ -43,6 +46,15 @@ public class AccountService {
                 .available(true)
                 .balance(100L)
                 .build();
+    }
+
+    private void validateEmail(String email){
+        String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(email);
+        if (!matcher.matches()){
+            throw new IllegalArgumentException("Email validation: failed.");
+        }
     }
 
     public List<AccountDtoResponse> getAllAccounts(Boolean isActive) {
