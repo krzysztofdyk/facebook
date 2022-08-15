@@ -49,6 +49,13 @@ public class AccountService {
     }
 
     private void validateEmail(String email){
+        List<Account> accounts = accountRepository.findAll();
+        List<String> emails = accounts.stream().map(Account::getEmail).collect(Collectors.toList());
+        for (String existingEmail: emails ) {
+            if(email.equals(existingEmail)){
+                throw new IllegalArgumentException("Email validation: email with name already exists in database.");
+            }
+        }
         String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
@@ -101,7 +108,8 @@ public class AccountService {
 
     public void deleteAccount(Long accountId){
         Account account = accountRepository.getById(accountId);
-        accountRepository.delete(account);
-        log.info("Account with ID: {} was deleted.", accountId);
+        //accountRepository.delete(account);
+        account.setKeyStatus(KeyStatus.Inactive);
+        log.info("Account with ID: {} was inactivated.", accountId);
     }
 }
