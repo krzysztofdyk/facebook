@@ -11,10 +11,10 @@ public class AccountDto {
 
     @NotNull
     private String firstName;
-
     @NotNull
     private String lastName;
-
     private String email;
     private String city;
+    private String login;
+    private String password;
 }

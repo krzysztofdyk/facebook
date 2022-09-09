@@ -1,5 +1,0 @@
-1.Tworzenie konta - mam
-2.Dodawanie zdjęcia - klasa z FILE
-3.Ściąganie profilu - klasa z WORD
-4.Dodanie transferu
-5.Dodanie rent

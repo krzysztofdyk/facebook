@@ -1,15 +1,16 @@
 package facebook.account;
 
 import com.sun.istack.NotNull;
-import facebook.enums.KeyStatus;
 import facebook.enums.AccountRole;
 import facebook.enums.AccountStatus;
+import facebook.enums.KeyStatus;
 import facebook.image.Image;
 import facebook.transfer.Transfer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -23,6 +24,10 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String login;
+
+    private String password;
 
     @Enumerated()
     @NotNull

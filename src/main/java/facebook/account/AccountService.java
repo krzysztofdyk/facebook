@@ -1,17 +1,19 @@
 package facebook.account;
 
 import facebook.email.EmailService;
-import facebook.enums.KeyStatus;
 import facebook.enums.AccountRole;
 import facebook.enums.AccountStatus;
+import facebook.enums.KeyStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 
 @AllArgsConstructor
 @Service
@@ -22,7 +24,7 @@ public class AccountService {
     private final AccountMapper accountMapper;
     private final EmailService emailService;
 
-    public void createAccount(AccountDto accountDto){
+    public void createAccount(AccountDto accountDto) {
         Account account = createAccountFromDto(accountDto);
         accountRepository.save(account);
      /*   try {
@@ -36,6 +38,8 @@ public class AccountService {
     private Account createAccountFromDto(AccountDto accountDto) {
         validateEmail(accountDto.getEmail());
         return Account.builder()
+                .login(accountDto.getLogin())
+                .password(accountDto.getPassword())
                 .keyStatus(KeyStatus.Active)
                 .firstName(accountDto.getFirstName())
                 .lastName(accountDto.getLastName())
@@ -48,18 +52,18 @@ public class AccountService {
                 .build();
     }
 
-    private void validateEmail(String email){
+    private void validateEmail(String email) {
         List<Account> accounts = accountRepository.findAll();
         List<String> emails = accounts.stream().map(Account::getEmail).collect(Collectors.toList());
-        for (String existingEmail: emails ) {
-            if(email.equals(existingEmail)){
+        for (String existingEmail : emails) {
+            if (email.equals(existingEmail)) {
                 throw new IllegalArgumentException("Email validation: email with name already exists in database.");
             }
         }
         String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
-        if (!matcher.matches()){
+        if (!matcher.matches()) {
             throw new IllegalArgumentException("Email validation: failed.");
         }
     }
@@ -79,34 +83,34 @@ public class AccountService {
         return null;
     }
 
-    private Boolean isActive(Account account){
+    private Boolean isActive(Account account) {
         return account.getKeyStatus().equals(KeyStatus.Active);
     }
 
-    public AccountDtoResponse getAccount(Long id){
+    public AccountDtoResponse getAccount(Long id) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(()->new EntityNotFoundException(String.format("Account ID: %s was not found",id)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Account ID: %s was not found", id)));
         if (id.equals(account.getId())) {
             log.info("Account with ID: {} was shown.", id);
         }
         return accountMapper.mapToAccountDtoResponse(account);
     }
 
-    public Account getAccountEntity(Long accountId){
+    public Account getAccountEntity(Long accountId) {
         return accountRepository.getById(accountId);
     }
 
-    public void updateAccount(Long accountId, AccountDto accountDto){
+    public void updateAccount(Long accountId, AccountDto accountDto) {
         Account account = accountRepository.getById(accountId);
         account.setFirstName(accountDto.getFirstName());
         account.setLastName(accountDto.getLastName());
         account.setEmail(accountDto.getEmail());
         account.setCity(accountDto.getCity());
         accountRepository.save(account);
-        log.info("Account with ID: {} was updated.",accountId);
+        log.info("Account with ID: {} was updated.", accountId);
     }
 
-    public void deleteAccount(Long accountId){
+    public void deleteAccount(Long accountId) {
         Account account = accountRepository.getById(accountId);
         //accountRepository.delete(account);
         account.setKeyStatus(KeyStatus.Inactive);
