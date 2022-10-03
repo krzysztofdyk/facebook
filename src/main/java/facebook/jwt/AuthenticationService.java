@@ -40,12 +40,11 @@ public class AuthenticationService {
             throw new Exception("Invalid credentials", e);
         }
         log.info("Authentication: step 2");
-        Account account = accountRepository.findByLogin(jwtRequest.getLogin());
         final UserDetails userDetails = userService.loadUserByUsername(jwtRequest.getLogin());
         log.info("Authentication: step 3");
         final String token = jwtUtility.generateToken(userDetails);
         log.info("Authentication successes.");
-        return new JwtResponse(account.getId(), token);
+        return new JwtResponse(userDetails.getUsername(), token);
     }
 
     // LOGOUT

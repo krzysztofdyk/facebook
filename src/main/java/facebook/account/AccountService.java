@@ -46,7 +46,7 @@ public class AccountService {
                 .email(accountDto.getEmail())
                 .city(accountDto.getCity())
                 .accountStatus(AccountStatus.Candidate)
-                .accountRole(AccountRole.Employee)
+                .accountRole(AccountRole.Technican)
                 .available(true)
                 .balance(100L)
                 .build();
@@ -87,11 +87,11 @@ public class AccountService {
         return account.getKeyStatus().equals(KeyStatus.Active);
     }
 
-    public AccountDtoResponse getAccount(Long id) {
-        Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Account ID: %s was not found", id)));
-        if (id.equals(account.getId())) {
-            log.info("Account with ID: {} was shown.", id);
+    public AccountDtoResponse getAccount(String login) {
+        Account account = accountRepository.findByLogin(login)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Account ID: %s was not found", login)));
+        if (login.equals(account.getLogin())) {
+            log.info("Account with ID: {} was shown.", login);
         }
         return accountMapper.mapToAccountDtoResponse(account);
     }

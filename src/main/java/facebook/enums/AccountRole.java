@@ -1,7 +1,7 @@
 package facebook.enums;
 
 public enum AccountRole {
-    Employee,
+    Technican,
     HR,
     Admin;
 }

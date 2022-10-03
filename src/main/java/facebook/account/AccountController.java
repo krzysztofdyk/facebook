@@ -22,10 +22,10 @@ public class AccountController {
         return accountService.getAllAccounts(isActive);
     }
 
-    @GetMapping("/{accountId}")
+    @GetMapping("/{accountLogin}")
     @ResponseStatus(HttpStatus.OK)
-    public AccountDtoResponse getAccount(@PathVariable(name = "accountId") Long accountId) {
-        return accountService.getAccount(accountId);
+    public AccountDtoResponse getAccount(@PathVariable(name = "accountLogin") String accountLogin) {
+        return accountService.getAccount(accountLogin);
     }
 
     @PostMapping

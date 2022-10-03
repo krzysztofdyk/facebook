@@ -17,12 +17,15 @@ import java.util.List;
 public class AccountDtoResponse {
     private Long id;
     private Long imageId;
+    @Enumerated(EnumType.STRING)
     private KeyStatus keyStatus;
     private String firstName;
     private String lastName;
     private String email;
     private String city;
+    @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
+    @Enumerated(EnumType.STRING)
     private AccountRole accountRole;
     private Boolean available;
     private Long balance;
