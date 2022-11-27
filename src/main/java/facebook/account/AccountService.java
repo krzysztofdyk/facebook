@@ -52,7 +52,7 @@ public class AccountService {
                 .build();
     }
 
-    private void validateEmail(String email) {
+    public void validateEmail(String email) {
         List<Account> accounts = accountRepository.findAll();
         List<String> emails = accounts.stream().map(Account::getEmail).collect(Collectors.toList());
         for (String existingEmail : emails) {
