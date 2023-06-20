@@ -31,7 +31,7 @@ public class AuthenticationService {
     private AccountRepository accountRepository;
 
     public JwtResponse authenticate(JwtRequest jwtRequest) throws Exception {
-        log.info("Authentication: step 1");
+        log.info("Authentication: start");
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(jwtRequest.getLogin(), jwtRequest.getPassword());
             authenticationManager.authenticate(authenticationToken);
@@ -39,12 +39,13 @@ public class AuthenticationService {
             log.info("Login failed for user: {}, bad credentials", jwtRequest.getLogin());
             throw new Exception("Invalid credentials", e);
         }
-        log.info("Authentication: step 2");
         final UserDetails userDetails = userService.loadUserByUsername(jwtRequest.getLogin());
-        log.info("Authentication: step 3");
         final String token = jwtUtility.generateToken(userDetails);
-        log.info("Authentication successes.");
-        return new JwtResponse(userDetails.getUsername(), token);
+        log.info("Authentication: end");
+        Account account = accountRepository.findByLogin(userDetails.getUsername()).orElseThrow();
+        log.info("Login: " + userDetails.getUsername());
+        log.info("Token: " + token);
+        return new JwtResponse(String.valueOf(account.getId()), userDetails.getUsername(), token);
     }
 
     // LOGOUT
