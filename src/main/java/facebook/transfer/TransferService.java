@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -27,48 +28,48 @@ public class TransferService {
 
     public List<TransferDtoResponse> findAllTransfers(String currencyName) {
         if (currencyName != null) {
-            log.info("Transfers with currency: {} were shown." , currencyName);
+            log.info("Transfers with currency: {} were shown.", currencyName);
             return mapDtoList(transferRepository.findByCurrency(currencyName));
 
         } else {
-            log.info("Transfers were shown." );
+            log.info("Transfers were shown.");
             return mapDtoList(transferRepository.findAll());
         }
 
     }
 
     public TransferDtoResponse findTransferById(Long transferId) {
-        log.info("Transfer with ID: {} was shown." , transferId);
+        log.info("Transfer with ID: {} was shown.", transferId);
         return mapToDto(transferRepository.getById(transferId));
     }
 
-    public Transfer createTransfer(Long senderId , TransferDtoRequest transferDtoRequest){
-        Account sender= accountRepository.getById(senderId);
+    public Transfer createTransfer(Long senderId, TransferDtoRequest transferDtoRequest) {
+        Account sender = accountRepository.getById(senderId);
         Account receiver = accountRepository.getById(transferDtoRequest.getToAccountId());
-        checkActivityAccount(sender,receiver);
+        checkActivityAccount(sender, receiver);
         checkAmountTransfer(transferDtoRequest.getAmount());
         LocalDate localDateNow = LocalDate.now();
         LocalTime localTimeNow = LocalTime.now();
-        Transfer transfer = mapToEntity(transferDtoRequest,sender,localDateNow,localTimeNow);
-        setAccountBalances(sender,receiver,transferDtoRequest.getAmount());
+        Transfer transfer = mapToEntity(transferDtoRequest, sender, localDateNow, localTimeNow);
+        setAccountBalances(sender, receiver, transferDtoRequest.getAmount());
         transferRepository.save(transfer);
-        log.info("New transfer with ID: {} was created" , transfer.getId());
+        log.info("New transfer with ID: {} was created", transfer.getId());
         return transfer;
     }
 
-    private void checkActivityAccount(Account sender, Account receiver){
-        if(sender.getKeyStatus().equals(KeyStatus.Inactive)){
-            throw new TransferException("Sender is inactive.",HttpStatus.BAD_REQUEST);
+    private void checkActivityAccount(Account sender, Account receiver) {
+        if (sender.getKeyStatus().equals(KeyStatus.Inactive)) {
+            throw new TransferException("Sender is inactive.", HttpStatus.BAD_REQUEST);
         }
-        if(receiver.getKeyStatus().equals(KeyStatus.Inactive)){
-            throw new TransferException("Sender is inactive.",HttpStatus.BAD_REQUEST);
+        if (receiver.getKeyStatus().equals(KeyStatus.Inactive)) {
+            throw new TransferException("Sender is inactive.", HttpStatus.BAD_REQUEST);
         }
     }
 
-    private void setAccountBalances(Account sender, Account receiver, Long money){
+    private void setAccountBalances(Account sender, Account receiver, Long money) {
         Long senderBalance = sender.getBalance();
         senderBalance = senderBalance - money;
-        Long receiverBalance =receiver.getBalance();
+        Long receiverBalance = receiver.getBalance();
         receiverBalance = receiverBalance + money;
         sender.setBalance(senderBalance);
         receiver.setBalance(receiverBalance);
@@ -76,7 +77,7 @@ public class TransferService {
         accountRepository.save(receiver);
     }
 
-    private void checkAmountTransfer(Long amount){
+    private void checkAmountTransfer(Long amount) {
         if (amount == 0) {
             throw new TransferException(ExceptionInfo.AMOUNT_WAS_PROVIDED_AS_ZERO.name(), HttpStatus.BAD_REQUEST);
         }
@@ -88,7 +89,7 @@ public class TransferService {
         transfer.setAmount(transferDtoRequest.getAmount());
         transfer.setCurrency(transferDtoRequest.getCurrency());
         transferRepository.save(transfer);
-        log.info("Transfer with ID: {} was updated." , transferId);
+        log.info("Transfer with ID: {} was updated.", transferId);
         return transfer;
     }
 
@@ -97,7 +98,7 @@ public class TransferService {
             throw new TransferException(ExceptionInfo.ID_WAS_NOT_FOUND.name(), HttpStatus.NOT_FOUND);
         });
         transferRepository.deleteById(transferId);
-        log.info("Transfer with ID: {} was deleted." , transferId);
+        log.info("Transfer with ID: {} was deleted.", transferId);
         // return ResponseEntity.noContent().build();
     }
 
@@ -119,6 +120,7 @@ public class TransferService {
                 .id(transfer.getId())
                 .title(transfer.getTitle())
                 .amount(transfer.getAmount())
+                .currency(transfer.getCurrency())
                 .fromAccountId(transfer.getFromAccount().getId())
                 .toAccountId(transfer.getToAccount().getId())
                 .localDate(transfer.getLocalDate())
@@ -149,7 +151,7 @@ public class TransferService {
                 .collect(Collectors.toSet());
     }
 
-    public boolean hasTransferFilledCurrencyName (Transfer transfer){
+    public boolean hasTransferFilledCurrencyName(Transfer transfer) {
         return Optional.ofNullable(transfer.getCurrency()).isEmpty();
     }
 
